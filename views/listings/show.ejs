@@ -1,0 +1,87 @@
+<% layout('/layouts/boilerplate') %>
+<body>
+    <div class="row mt-3">
+        <div class="col-8 offset-3">
+            <h3><%= listing.title %> </h3>
+            <div class="card listing-card" style="width: 18rem;">
+                <img src="<%= listing.image.url %>" class=" preview-img" alt="Listing Image" >
+                    <div class="card-body">
+                        <%= listing.description %><br>
+                        &#8377; <%= listing.price.toLocaleString("en-IN") %> <br>
+                        <%= listing.location %><br>
+                        <%= listing.country %>
+                    </div>
+            </div>
+            <br>
+            <div class="btns mb-3">
+                <a href="/listings/<%= listing._id %>/edit" class="btn btn-warning edit-btn col-2" >Edit</a>
+
+                <form method="POST" action="/listings/<%= listing._id%>?_method=DELETE" onsubmit="return confirm('Are you sure you want to delete this listing?');"">
+                    <button class="btn btn-danger offset-2">DELETE</button>
+                </form>
+            </div>
+        </div>
+    </div>
+        <!-- review section -->
+         <!-- shared reviews -->
+        <div class="row col-8 offset-3 mb-3">
+            <hr>
+            <h4><b>All reviews</b></h4>
+            <% for (review of listing.reviews) {%>
+                <div class="card col-6 mb-3 ms-3" style="width: 25rem;">
+                    <div class="card-body col-6 ms-3 mb-3">
+                        <h6 class="card-title">Client</h6>
+                        <p class="card-text"><% for (let i = 0; i < review.rating; i++) {%> ⭐ <% } %></p>
+                        <p class="card-text"><%= review.comment %></p>
+                    </div>
+                    <form class="mb-3 ms-3" method="POST" action="/listings/<%= listing._id%>/reviews/<%= review._id %>?_method=DELETE" onsubmit="return confirm('Are you sure you want to delete this review?');">
+                        <button class="btn btn-dark btn-sm">DELETE</button>
+                    </form>
+                </div>
+            <%} %>
+        </div>
+
+        <!-- post review form -->
+        <div class=" col-8 offset-3 mb-3">
+            <hr>
+            <h4><b>Share you Experience</b></h4>
+            <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation">
+                <div class="mb-3 mt-3">
+                    <label for="rating" class="form-label ">Rating:</label>
+                    <div class="rating-container mt-4">
+                        <span id="ratingValue">3</span>
+                    </div>
+                    <input type="range" class="form-range" id="rating" name="review[rating]" min="1" max="5">
+                    
+                </div>
+                <div class="mb-3 mt-3">
+                    <label for="comment" class="form-label">Comment:</label>
+                    <textarea id="comment" name="review[comment]" rows="4" cols="50" class="form-control" required></textarea>
+                    <div class="invalid-feedback">Please enter your comment.</div>
+                    <br>
+                </div>
+                    <button class="btn btn-outline-primary" type="submit">Submit Review</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+<script>
+    const rating = document.querySelector("#rating");
+    const ratingValue = document.querySelector("#ratingValue");
+
+    function updateRating() {
+        const min = rating.min;
+        const max = rating.max;
+        const value = rating.value;
+
+        const percentage = ((value - min) / (max - min)) * 100;
+
+        ratingValue.innerText = value;
+        ratingValue.style.left = percentage + "%";
+    }
+
+    rating.addEventListener("input", updateRating);
+
+    updateRating();
+</script>
